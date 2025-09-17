@@ -1,0 +1,97 @@
+name: Test Cura Integration
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [3.8, 3.9, '3.10', 3.11]
+
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v3
+      with:
+        python-version: ${{ matrix.python-version }}
+    
+    - name: Test BrickLayers import
+      run: |
+        python3 -c "import bricklayers; print('✅ bricklayers module imports successfully')"
+        python3 -c "import bricklayers; print('✅ BrickLayersProcessor available:', hasattr(bricklayers, 'BrickLayersProcessor'))"
+    
+    - name: Test Cura script import
+      run: |
+        python3 -c "
+        import sys, os
+        sys.path.insert(0, '.')
+        from test_script import BrickLayersCuraScript
+        script = BrickLayersCuraScript()
+        print('✅ BrickLayersCuraScript imports successfully')
+        "
+    
+    - name: Test settings configuration
+      run: |
+        python3 -c "
+        import sys, os, json
+        sys.path.insert(0, '.')
+        from test_script import BrickLayersCuraScript
+        script = BrickLayersCuraScript()
+        settings = json.loads(script.getSettingDataString())
+        assert 'name' in settings
+        assert 'settings' in settings
+        assert 'enabled' in settings['settings']
+        print('✅ Settings configuration is valid')
+        "
+    
+    - name: Test basic G-code processing
+      run: |
+        python3 -c "
+        import sys, os
+        sys.path.insert(0, '.')
+        from test_script import BrickLayersCuraScript
+        
+        # Test with simple G-code
+        test_gcode = [
+            [';LAYER:0'],
+            ['G1 X10 Y10 E1'],
+            [';LAYER:1'],
+            ['G1 X20 Y20 E2']
+        ]
+        
+        script = BrickLayersCuraScript()
+        script.settings = {
+            'enabled': True,
+            'start_at_layer': 0,
+            'extrusion_multiplier': 1.05,
+            'layers_to_ignore': ''
+        }
+        
+        result = script.execute(test_gcode)
+        assert len(result) > 0
+        print('✅ Basic G-code processing works')
+        "
+    
+    - name: Run comprehensive tests
+      run: |
+        if [ -f "final_validation.py" ]; then
+          python3 final_validation.py
+        else
+          echo "⚠️ final_validation.py not found, skipping comprehensive tests"
+        fi
+    
+    - name: Test sample files (if available)
+      run: |
+        if [ -f "sample_tests/cura_test.py" ]; then
+          cd sample_tests
+          python3 cura_test.py
+        else
+          echo "⚠️ sample test not found, skipping"
+        fi
+

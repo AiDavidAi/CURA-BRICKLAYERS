@@ -1,21 +1,19 @@
-# BrickLayers for Ultimaker Cura
+# BrickLayers for Cura
+Interlocking Layers Post-Processing Script for Ultimaker Cura
 
-A post-processing script that implements the BrickLayers algorithm for Ultimaker Cura, creating interlocking layers that significantly improve the strength of 3D printed parts.
+## Video about this script:
+[![Brick Layers for everybody](https://img.youtube.com/vi/qqJOa46OTTs/maxresdefault.jpg)](https://www.youtube.com/watch?v=qqJOa46OTTs)
 
-## What is BrickLayers?
+---
+# Cura Integration: v1.0.0
 
-BrickLayers transforms the arrangement of perimeter beads in your G-code from a rectangular pattern to a hexagonal pattern, similar to how bricks are laid in construction. This creates stronger interlocking between layers, dramatically improving part strength.
+This is the Cura-compatible version of the popular BrickLayers algorithm, originally designed for PrusaSlicer, OrcaSlicer, and BambuStudio. 
 
-**Key Benefits:**
-- 🔧 **Stronger Parts**: Significantly improved layer adhesion and part strength
-- 🎯 **Easy Integration**: Works as a post-processing script in Cura
-- ⚙️ **Configurable**: Adjustable settings for different print requirements
-- 🔄 **Compatible**: Works with existing Cura workflows and settings
+The integration provides seamless post-processing within Cura's native interface - no command line setup required!
 
-## Video Demonstration
+![BrickLayers integrated into Cura's post-processing interface](docs/img/cura_postprocessing.png)
 
-For a detailed explanation of the BrickLayers technique, watch:
-- [Brick Layers: Stronger 3D Prints TODAY - instead of 2040](https://youtu.be/9IdNA_hWiyE)
+---
 
 ## Installation
 
@@ -33,12 +31,16 @@ For a detailed explanation of the BrickLayers technique, watch:
 
 For advanced users, you can package this as a proper Cura plugin by creating a `plugin.json` file and following Cura's plugin development guidelines.
 
-## Usage
+---
+
+## Setup in Cura
 
 1. **Enable the script**:
    - In Cura, go to **Extensions → Post Processing → Modify G-Code**
    - Click **Add a script**
    - Select **BrickLayers** from the list
+
+![Cura Post-Processing Scripts interface](docs/img/cura_interface.png)
 
 2. **Configure settings**:
    - **Enable BrickLayers**: Check to activate the script
@@ -48,37 +50,62 @@ For advanced users, you can package this as a proper Cura plugin by creating a `
 
 3. **Slice and print**: Slice your model normally - BrickLayers will process the G-code automatically
 
-## Settings Explained
+### **Cura Settings Recommendations**:
 
-### Start at Layer
-- **Default**: 3
-- **Purpose**: Skips the first few layers to ensure good bed adhesion
-- **Recommendation**: Keep at 3 unless you have specific requirements
+For best results with BrickLayers in Cura:
 
-### Extrusion Multiplier
-- **Default**: 1.05 (5% increase)
-- **Purpose**: Compensates for the redistribution of material
-- **Range**: 0.5 to 2.0
-- **Tuning**: Start with 1.05 and adjust based on print quality
+![Recommended Cura wall settings](docs/img/cura_wall_settings.png)
 
-### Layers to Ignore
-- **Default**: Empty
-- **Purpose**: Skip BrickLayers processing on specific layers
-- **Format**: Comma-separated numbers (e.g., "5,10,15")
-- **Use case**: Skip layers with complex geometry or overhangs
-
-## Cura Settings Recommendations
-
-For best results with BrickLayers:
-
-### Print Settings
+**Print Settings:**
 - **Layer Height**: 0.2mm or 0.3mm work well
 - **Wall Line Count**: 2-4 walls recommended
+- **Wall Ordering**: Any order works (Cura handles this automatically)
 - **Infill**: Any infill pattern works
 
-### Advanced Settings
+**Advanced Settings:**
 - **Print Sequence**: "All at Once" (avoid "One at a Time")
 - **Z Hop**: Enable for better travel moves
+
+### **No Command Line Required!**
+
+Unlike other slicers, Cura integration means:
+- ✅ **No Python installation needed** - Cura handles everything
+- ✅ **No path configuration** - Works out of the box
+- ✅ **Native UI integration** - Configure through Cura's interface
+- ✅ **Automatic processing** - Runs seamlessly during slicing
+
+---
+
+# How to see the Preview?
+
+Unfortunately, like other slicers, Cura doesn't show post-processing changes automatically in the preview.
+
+To see the BrickLayers modifications:
+1. **Slice your model** with BrickLayers enabled
+2. **Save the G-code** to a file
+3. **Drag the G-code file back into Cura** to see the modified toolpaths
+
+This limitation exists in all slicers and is not specific to the Cura integration.
+
+More details: https://github.com/GeekDetour/BrickLayers/issues/20
+
+---
+
+## Command Line Interface (Optional)
+
+While the Cura integration is the recommended approach, you can still use the script from command line if needed.
+
+For command line usage examples, check the sample tests:
+```sh
+cd sample_tests
+chmod +x simpletest.sh
+./simpletest.sh
+```
+
+You should see something like this:
+![running the simpletest.sh on your machine](docs/img/cli_simpletest.png)
+
+---
 
 ## Troubleshooting
 
@@ -105,6 +132,8 @@ If you encounter issues:
 2. Try with a simple test model first
 3. Verify your G-code contains the expected layer markers (`;LAYER:`)
 
+---
+
 ## Technical Details
 
 ### How It Works
@@ -118,19 +147,13 @@ If you encounter issues:
 - **G-code Format**: Standard Cura G-code with `;LAYER:` markers
 - **Printers**: Compatible with any printer that works with Cura
 
+---
+
 ## Credits
 
 - **Original BrickLayers Algorithm**: [GeekDetour/BrickLayers](https://github.com/GeekDetour/BrickLayers)
 - **Cura Integration**: Adapted for Ultimaker Cura compatibility
 - **Patent**: The hexagonal 3D printing pattern is public domain (Batchelder: US005653925A, 1995)
-
-## License
-
-This project follows the same license as the original BrickLayers project. See the LICENSE file for details.
-
-## Contributing
-
-Contributions are welcome! Please feel free to submit issues, feature requests, or pull requests.
 
 ## Support
 

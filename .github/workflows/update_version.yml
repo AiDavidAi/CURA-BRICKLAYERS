@@ -1,0 +1,70 @@
+name: Update Version
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  update-version:
+    runs-on: ubuntu-latest
+    if: "!contains(github.event.head_commit.message, 'Update version to')"
+    
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
+        token: ${{ secrets.GITHUB_TOKEN }}
+    
+    - name: Get version info
+      id: version
+      run: |
+        # Get the latest tag
+        LATEST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "v0.0.0")
+        
+        # Get commit count since tag
+        COMMIT_COUNT=$(git rev-list --count ${LATEST_TAG}..HEAD 2>/dev/null || git rev-list --count HEAD)
+        
+        # Get short commit hash
+        SHORT_HASH=$(git rev-parse --short HEAD)
+        
+        # Create version string
+        if [ "$COMMIT_COUNT" = "0" ]; then
+          VERSION="$LATEST_TAG"
+        else
+          VERSION="${LATEST_TAG}-${COMMIT_COUNT}-g${SHORT_HASH}"
+        fi
+        
+        echo "version=$VERSION" >> $GITHUB_OUTPUT
+        echo "Version: $VERSION"
+    
+    - name: Update version in BrickLayersCuraScript.py
+      run: |
+        VERSION="${{ steps.version.outputs.version }}"
+        
+        # Update version in the Cura script
+        if [ -f "BrickLayersCuraScript.py" ]; then
+          sed -i "s/__version__ = \".*\"/__version__ = \"$VERSION\"/" BrickLayersCuraScript.py || true
+          echo "Updated version in BrickLayersCuraScript.py to $VERSION"
+        fi
+        
+        # Update version in bricklayers.py
+        if [ -f "bricklayers.py" ]; then
+          sed -i "s/__version__ = \".*\"/__version__ = \"$VERSION\"/" bricklayers.py || true
+          echo "Updated version in bricklayers.py to $VERSION"
+        fi
+    
+    - name: Commit version update
+      run: |
+        VERSION="${{ steps.version.outputs.version }}"
+        
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        
+        if git diff --quiet; then
+          echo "No version changes to commit"
+        else
+          git add -A
+          git commit -m "Update version to $VERSION" || true
+          git push || true
+        fi
+

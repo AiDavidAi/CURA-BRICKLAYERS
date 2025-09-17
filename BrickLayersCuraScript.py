@@ -2,15 +2,18 @@
 BrickLayers post‑processing script for Ultimaker Cura
 ----------------------------------------------------
 
-This script integrates the BrickLayers algorithm into Cura’s post‑
+This script integrates the BrickLayers algorithm into Cura's post‑
 processing framework.  When enabled, it rewrites the wall loops in the
 G‑code produced by Cura (or compatible slicers) into a staggered,
 hexagonal arrangement, greatly improving layer adhesion.
 
+Version: v1.0.0-cura
+Based on: GeekDetour/BrickLayers v0.2.1
+
 Installation
 ============
 
-Place this file and the accompanying `bricklayers.py` in Cura’s
+Place this file and the accompanying `bricklayers.py` in Cura's
 configuration `scripts` folder (open the folder via *Help → Show
 Configuration Folder*).  Alternatively, package them as a plug‑in by
 zipping them with a `plugin.json` and `__init__.py`.  The file name,
