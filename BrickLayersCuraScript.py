@@ -188,9 +188,18 @@ class BrickLayersCuraScript(Script):
         processed_lines: List[str] = []
         for item in processed_iter:
             if hasattr(item, "to_gcode"):
-                processed_lines.append(item.to_gcode())
+                gcode_result = item.to_gcode()
+                # Ensure the result is a string, not a list
+                if isinstance(gcode_result, list):
+                    processed_lines.extend(str(line) for line in gcode_result)
+                else:
+                    processed_lines.append(str(gcode_result))
             else:
-                processed_lines.append(str(item))
+                # Ensure item is converted to string properly
+                if isinstance(item, list):
+                    processed_lines.extend(str(line) for line in item)
+                else:
+                    processed_lines.append(str(item))
 
         boundaries = (";LAYER:", ";LAYER_CHANGE", "; CHANGE_LAYER")
         output_layers: List[List[str]] = []
