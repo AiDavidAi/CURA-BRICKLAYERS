@@ -38,7 +38,18 @@ import sys
 import re
 from typing import List, Iterable
 
-from ..Script import Script  # type: ignore
+# Try to import from Cura, with fallback for standalone testing
+try:
+    from ..Script import Script  # type: ignore
+except ImportError:
+    # Running outside Cura or in standalone mode
+    class Script:
+        """Mock Script class for standalone testing"""
+        def __init__(self):
+            self.settings = {}
+        
+        def getSettingValueByKey(self, key: str):
+            return self.settings.get(key, None)
 
 
 def _import_bricklayers() -> "module":
