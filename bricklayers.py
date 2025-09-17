@@ -1691,9 +1691,9 @@ class BrickLayersProcessor:
                                 # marker (`;MESH:NONMESH` or `;MESH:NOMESH`) does not
                                 # include the object name.  Otherwise append the
                                 # name as in Slic3r/Orca.
-                                if feature.const_printingobject_stop.startswith(";MESH:"):
+                                if feature.const_printingobject_stop and feature.const_printingobject_stop.startswith(";MESH:"):
                                     buffer.append(from_gcode(f"{feature.const_printingobject_stop}\n"))
-                                else:
+                                elif feature.const_printingobject_stop:
                                     buffer.append(from_gcode(f"{feature.const_printingobject_stop}{feature.current_object.name}\n"))
                             if not deffered_line.current.relative_extrusion:
                                 # If the gcode was using absolute extrusion, insert an M83 for Relative Extrusion
@@ -1747,9 +1747,9 @@ class BrickLayersProcessor:
                             if current_object is not None:
                                 # See note above: Cura `;MESH:` stop markers omit the
                                 # object name.
-                                if feature.const_printingobject_stop.startswith(";MESH:"):
+                                if feature.const_printingobject_stop and feature.const_printingobject_stop.startswith(";MESH:"):
                                     buffer.append(from_gcode(f"{feature.const_printingobject_stop}\n"))
-                                else:
+                                elif feature.const_printingobject_stop:
                                     buffer.append(from_gcode(f"{feature.const_printingobject_stop}{current_object.name}\n"))
                             if previous_loop is not None:
                                 buffer.extend(self.travel_to(deffered_line.previous, simulator, feature, previous_loop, None, target_z))
